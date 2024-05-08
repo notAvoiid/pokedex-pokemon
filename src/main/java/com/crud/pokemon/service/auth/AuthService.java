@@ -45,7 +45,7 @@ public class AuthService {
         try {
             String token = JWT.create()
                     .withClaim("role", String.valueOf(data.getRole()))
-                    .withIssuer("pokemon-crud")
+                    .withIssuer("pokedex-pokemon")
                     .withSubject(data.getUsername())
                     .withIssuedAt(now)
                     .withExpiresAt(getExpirationDate())
@@ -61,7 +61,7 @@ public class AuthService {
         try {
             algorithm = Algorithm.HMAC256(secretKey.getBytes());
             return JWT.require(algorithm)
-                    .withIssuer("pokemon-crud")
+                    .withIssuer("pokedex-pokemon")
                     .build()
                     .verify(token)
                     .getSubject()
