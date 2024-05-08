@@ -73,13 +73,13 @@ public class Pokemon implements Serializable {
     }
 
     public void returner(PokemonRequestDTO request) {
-        this.setName(request.getName());
-        this.setCategory(request.getCategory());
-        this.setAbilities(request.getAbilities());
-        this.setType(request.getType());
-        this.setWeakness(request.getWeakness());
-        this.setHeight(request.getHeight());
-        this.setWeight(request.getWeight());
+        this.setName(request.name());
+        this.setCategory(request.category());
+        this.setAbilities(request.abilities());
+        this.setType(request.type());
+        this.setWeakness(request.weakness());
+        this.setHeight(request.height());
+        this.setWeight(request.weight());
 
     }
 
