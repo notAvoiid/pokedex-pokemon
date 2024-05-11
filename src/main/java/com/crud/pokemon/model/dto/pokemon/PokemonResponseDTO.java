@@ -1,6 +1,9 @@
 package com.crud.pokemon.model.dto.pokemon;
 
-public record PokemonResponseDTO (Long id,
+import com.crud.pokemon.model.Pokemon;
+
+public record PokemonResponseDTO (
+    Long id,
     String name,
     String category,
     String abilities,
@@ -8,4 +11,16 @@ public record PokemonResponseDTO (Long id,
     String weakness,
     String height,
     String weight
-){}
+){
+    public PokemonResponseDTO(Pokemon pokemon) {
+        this(
+                pokemon.getId(),
+                pokemon.getName(),
+                pokemon.getCategory(),
+                pokemon.getAbilities(),
+                pokemon.getType(),
+                pokemon.getWeakness(),
+                pokemon.getHeight(),
+                pokemon.getWeight());
+    }
+}
