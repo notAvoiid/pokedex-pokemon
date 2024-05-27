@@ -43,7 +43,7 @@ public class AuthService {
 
     public String generateToken(User data) {
         try {
-            String token = JWT.create()
+            return JWT.create()
                     .withClaim("role", String.valueOf(data.getRole()))
                     .withIssuer("pokedex-pokemon")
                     .withSubject(data.getUsername())
@@ -51,9 +51,8 @@ public class AuthService {
                     .withExpiresAt(getExpirationDate())
                     .sign(algorithm)
                     .strip();
-            return token;
         } catch (JWTCreationException ex) {
-            throw new RuntimeException("Error while generating token. Try again later!", ex);
+            throw new JWTCreationException("Error while generating token. Try again later!", ex);
         }
     }
 
@@ -74,8 +73,8 @@ public class AuthService {
     public Optional<User> getAuthUser() {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         Object principal = authentication.getPrincipal();
-        if(principal instanceof UserDetails) {
-            String username = ((UserDetails) principal).getUsername();
+        if(principal instanceof UserDetails userDetails) {
+            String username = userDetails.getUsername();
             return userRepository.loadByUsername(username);
         } else
             throw new NullUserException();

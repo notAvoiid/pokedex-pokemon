@@ -28,19 +28,17 @@ import java.util.stream.Collectors;
 @Slf4j
 public class UserService implements UserDetailsService {
 
-    @Autowired
-    private ApplicationContext context;
+    private final ApplicationContext context;
+    private final UserRepository userRepository;
+    private final AuthService authService;
+    private final PasswordEncoder encoder;
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private AuthService authService;
-
-    @Autowired
-    private PasswordEncoder encoder;
-
-    private AuthenticationManager authenticationManager;
+    public UserService(ApplicationContext context, UserRepository userRepository, AuthService authService, PasswordEncoder encoder) {
+        this.context = context;
+        this.userRepository = userRepository;
+        this.authService = authService;
+        this.encoder = encoder;
+    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -53,9 +51,9 @@ public class UserService implements UserDetailsService {
         UserDetails user = userRepository.findByUsername(data.username());
         if (user == null || !encoder.matches(data.password(), user.getPassword())) throw new WrongMatchPasswordUsernameException();
 
-        authenticationManager = context.getBean(AuthenticationManager.class);
+        AuthenticationManager authenticationManager = context.getBean(AuthenticationManager.class);
         var usernamePassword = new UsernamePasswordAuthenticationToken(data.username(), data.password());
-        var auth = this.authenticationManager.authenticate(usernamePassword);
+        var auth = authenticationManager.authenticate(usernamePassword);
         var token = authService.generateToken((User) auth.getPrincipal());
 
         log.info("An user is authenticated!");

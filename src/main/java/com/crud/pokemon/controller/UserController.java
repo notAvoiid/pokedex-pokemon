@@ -88,7 +88,7 @@ public class UserController {
                     @ApiResponse(description = "Not found", responseCode = "404", content = @Content),
                     @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content),
             })
-    public ResponseEntity<?> deleteUser(@PathVariable String username, HttpServletRequest request) {
+    public ResponseEntity<Object> deleteUser(@PathVariable String username, HttpServletRequest request) {
         userService.deleteUser(username);
         return ResponseEntity.noContent().build();
     }

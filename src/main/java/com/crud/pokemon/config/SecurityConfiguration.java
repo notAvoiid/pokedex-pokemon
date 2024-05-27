@@ -20,26 +20,31 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfiguration {
 
-    @Autowired
-    private SecurityFilter securityFilter;
+    private final SecurityFilter securityFilter;
+
+    public SecurityConfiguration(SecurityFilter securityFilter) {
+        this.securityFilter = securityFilter;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        final String ADMIN_ROLE = "ADMIN";
+        final String USER_ROLE = "USER";
         return http
                 .csrf(csrf -> csrf.disable())
                 .httpBasic(https -> https.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.POST, "/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/pokemon/{id}", "/api/v1/pokemon/findByAll", "/api/v1/pokemon").hasRole("USER")
-                        .requestMatchers(HttpMethod.POST, "/api/v1/pokemon/save").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/api/v1/pokemon/favorite", "/api/v1/pokemon/unfavorite").hasRole("USER")
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/pokemon/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/v1/pokemon/{id}").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/v1/user").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "api/v1/user").hasRole("USER")
-                        .requestMatchers(HttpMethod.GET, "api/v1/user/${username}").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "api/v1/user/${username}").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/pokemon/{id}", "/api/v1/pokemon/findByAll", "/api/v1/pokemon").hasRole(USER_ROLE)
+                        .requestMatchers(HttpMethod.POST, "/api/v1/pokemon/save").hasRole(ADMIN_ROLE)
+                        .requestMatchers(HttpMethod.POST, "/api/v1/pokemon/favorite", "/api/v1/pokemon/unfavorite").hasRole(USER_ROLE)
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/pokemon/**").hasRole(ADMIN_ROLE)
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/pokemon/{id}").hasRole(ADMIN_ROLE)
+                        .requestMatchers(HttpMethod.GET, "/api/v1/user").hasRole(ADMIN_ROLE)
+                        .requestMatchers(HttpMethod.PUT, "api/v1/user").hasRole(USER_ROLE)
+                        .requestMatchers(HttpMethod.GET, "api/v1/user/${username}").hasRole(ADMIN_ROLE)
+                        .requestMatchers(HttpMethod.DELETE, "api/v1/user/${username}").hasRole(ADMIN_ROLE)
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated()
                 )
