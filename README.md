@@ -4,4 +4,4 @@
 - [ ] Add Refresh token.
 - [x] Add Flyway.
 - [x] Add Docker.
-- [ ] Add Pagination.
+- [x] Add Pagination.
