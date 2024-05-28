@@ -4,7 +4,7 @@ import com.crud.pokemon.model.dto.pokemon.PokemonResponseDTO;
 import com.crud.pokemon.model.dto.users.AuthenticationDTO;
 import com.crud.pokemon.model.dto.users.LoginResponseDTO;
 import com.crud.pokemon.model.dto.users.RegisterDTO;
-import com.crud.pokemon.service.user.UserService;
+import com.crud.pokemon.service.user.UserServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -22,9 +22,9 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Authentication", description = "Endpoint for managing authentication")
 public class AuthController {
 
-    private final UserService userService;
+    private final UserServiceImpl userService;
 
-    public AuthController(UserService userService) {
+    public AuthController(UserServiceImpl userService) {
         this.userService = userService;
     }
 

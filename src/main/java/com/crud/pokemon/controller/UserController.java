@@ -2,7 +2,7 @@ package com.crud.pokemon.controller;
 
 import com.crud.pokemon.model.dto.users.UpdateDTO;
 import com.crud.pokemon.model.dto.users.UserDTO;
-import com.crud.pokemon.service.user.UserService;
+import com.crud.pokemon.service.user.UserServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -10,7 +10,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,8 +20,11 @@ import java.util.List;
 @Tag(name = "Users", description = "Endpoint for managing Users")
 public class UserController {
 
-    @Autowired
-    private UserService userService;
+    private final UserServiceImpl userService;
+
+    public UserController(UserServiceImpl userService) {
+        this.userService = userService;
+    }
 
     @GetMapping
     @Operation(summary = "Find all Users!", description = "Find all Users!",
