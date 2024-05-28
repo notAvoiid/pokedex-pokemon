@@ -1,5 +1,6 @@
 package com.crud.pokemon.service.pokemon;
 
+import com.crud.pokemon.controller.PokemonController;
 import com.crud.pokemon.exceptions.EntityNotFoundException;
 import com.crud.pokemon.exceptions.NullPokemonException;
 import com.crud.pokemon.exceptions.WishListPokemonException;
@@ -10,12 +11,18 @@ import com.crud.pokemon.model.dto.pokemon.PokemonResponseDTO;
 import com.crud.pokemon.repository.PokemonRepository;
 import com.crud.pokemon.service.auth.AuthService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Service
 @Slf4j
@@ -23,20 +30,31 @@ public class PokemonServiceImpl implements PokemonService {
 
     private final AuthService authService;
     private final PokemonRepository repository;
+    private final PagedResourcesAssembler<PokemonResponseDTO> assembler;
 
-    public PokemonServiceImpl(AuthService authService, PokemonRepository repository) {
+    public PokemonServiceImpl(AuthService authService, PokemonRepository repository, PagedResourcesAssembler<PokemonResponseDTO> assembler) {
         this.authService = authService;
         this.repository = repository;
+        this.assembler = assembler;
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<PokemonResponseDTO> findALl() {
+    public PagedModel<EntityModel<PokemonResponseDTO>> findAll(Pageable pageable) {
 
-        List<Pokemon> data = repository.findAll();
+        var pokemonPages = repository.findAll(pageable);
+        var pokemonDTOPages = pokemonPages.map(PokemonResponseDTO::new);
+        pokemonDTOPages.map(p -> p.add(linkTo(methodOn(PokemonController.class).findById(p.getId())).withSelfRel()));
+
+        Link link = linkTo(methodOn(PokemonController.class).findAll(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                "ASC"
+        )).withSelfRel();
+
 
         log.info("Finding all Pokemon!");
-        return data.stream().map(PokemonResponseDTO::new).collect(Collectors.toList());
+        return assembler.toModel(pokemonDTOPages, link);
     }
 
     @Override
@@ -52,20 +70,28 @@ public class PokemonServiceImpl implements PokemonService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<PokemonResponseDTO> findByKeyword(String keyword) {
+    public PagedModel<EntityModel<PokemonResponseDTO>> findByKeyword(String keyword, Pageable pageable) {
 
-        List<Pokemon> data = repository.findByKeyword(keyword);
+        var pokemonPages = repository.findByKeyword(keyword, pageable);
+        var pokemonDTOPages = pokemonPages.map(PokemonResponseDTO::new);
+        pokemonDTOPages.map(p -> p.add(linkTo(methodOn(PokemonController.class).findById(p.getId())).withSelfRel()));
+
+        Link link = linkTo(methodOn(PokemonController.class).findAll(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                "ASC"
+        )).withSelfRel();
         log.info("Finding a pokemon by his name/category/abilities");
 
-        return data.stream().map(PokemonResponseDTO::new).collect(Collectors.toList());
+        return assembler.toModel(pokemonDTOPages, link);
     }
 
     @Override
     @Transactional
     public PokemonResponseDTO save(PokemonRequestDTO request) {
             Pokemon pokemonToSave = new Pokemon(request);
-            PokemonResponseDTO responseDTO = new PokemonResponseDTO(repository.save(pokemonToSave));
-            log.info("Saved a Pokémon: {}", responseDTO.name());
+        PokemonResponseDTO responseDTO = new PokemonResponseDTO(repository.save(pokemonToSave));
+            log.info("Saved a Pokémon: {}", responseDTO.getName());
             return responseDTO;
     }
 

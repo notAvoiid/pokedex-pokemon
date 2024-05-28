@@ -1,6 +1,5 @@
 package com.crud.pokemon.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -42,7 +41,7 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.PUT, "/api/v1/pokemon/**").hasRole(ADMIN_ROLE)
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/pokemon/{id}").hasRole(ADMIN_ROLE)
                         .requestMatchers(HttpMethod.GET, "/api/v1/user").hasRole(ADMIN_ROLE)
-                        .requestMatchers(HttpMethod.PUT, "api/v1/user").hasRole(USER_ROLE)
+                        .requestMatchers(HttpMethod.PUT, "api/v1/user").hasRole(ADMIN_ROLE)
                         .requestMatchers(HttpMethod.GET, "api/v1/user/${username}").hasRole(ADMIN_ROLE)
                         .requestMatchers(HttpMethod.DELETE, "api/v1/user/${username}").hasRole(ADMIN_ROLE)
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()

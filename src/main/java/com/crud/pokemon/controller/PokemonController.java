@@ -10,10 +10,16 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import static org.springframework.data.domain.PageRequest.of;
+import static org.springframework.data.domain.Sort.Direction.ASC;
+import static org.springframework.data.domain.Sort.Direction.DESC;
+import static org.springframework.data.domain.Sort.by;
 
 @RestController
 @RequestMapping("/api/v1/pokemon")
@@ -40,8 +46,14 @@ public class PokemonController {
                     @ApiResponse(description = "Forbidden", responseCode = "403", content = @Content),
                     @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content),
             })
-    public ResponseEntity<List<PokemonResponseDTO>> findAll() {
-        return ResponseEntity.ok(service.findALl());
+    public ResponseEntity<PagedModel<EntityModel<PokemonResponseDTO>>> findAll(
+            @RequestParam(value = "page", defaultValue = "0") Integer page,
+            @RequestParam(value = "size", defaultValue = "12") Integer size,
+            @RequestParam(value = "direction", defaultValue = "asc") String direction
+    ) {
+        var sortDirection = "desc".equalsIgnoreCase(direction) ? DESC : ASC;
+        Pageable pageable = of(page, size, by(sortDirection, "name"));
+        return ResponseEntity.ok(service.findAll(pageable));
     }
 
     @GetMapping("/{id}")
@@ -74,10 +86,15 @@ public class PokemonController {
                     @ApiResponse(description = "Forbidden", responseCode = "403", content = @Content),
                     @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content),
             })
-    public ResponseEntity<List<PokemonResponseDTO>> findByKeyword(
-            @RequestParam(required = false) String keyword
+    public ResponseEntity<PagedModel<EntityModel<PokemonResponseDTO>>> findByKeyword(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(value = "page", defaultValue = "0") Integer page,
+            @RequestParam(value = "size", defaultValue = "12") Integer size,
+            @RequestParam(value = "direction", defaultValue = "asc") String direction
             ) {
-        return ResponseEntity.ok(service.findByKeyword(keyword));
+        var sortDirection = "desc".equalsIgnoreCase(direction) ? DESC : ASC;
+        Pageable pageable = of(page, size, by(sortDirection, "name"));
+        return ResponseEntity.ok(service.findByKeyword(keyword, pageable));
     }
 
     @PostMapping("/save")
